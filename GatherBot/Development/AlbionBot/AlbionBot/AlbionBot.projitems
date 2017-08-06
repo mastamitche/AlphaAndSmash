@@ -9,5 +9,6 @@
     <Import_RootNamespace>AlbionBot</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)AlbionBot\" />
   </ItemGroup>
 </Project>
