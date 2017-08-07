@@ -58,7 +58,7 @@ namespace Ennui.Script.Official
             List<Api.Direct.IItemStack> sickles = api.Inventory.GetItemsBySubstring("sickle");
             List<List<Api.Direct.IItemStack>> allTools = new List<List<Api.Direct.IItemStack>> { axes, picks, knives, hammers, sickles };
 
-            List<KeyValuePair<ResourceType, List<int>>> returnList = new List<KeyValuePair<int, List<int>>>();
+            List<KeyValuePair<ResourceType, List<int>>> returnList = new List<KeyValuePair<ResourceType, List<int>>>();
 
             int i = 0;
             int j = 0;
