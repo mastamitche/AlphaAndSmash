@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <ApplicationIcon />
+    <OutputTypeEx>library</OutputTypeEx>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ActiproSoftware.Shared.WinForms">
+      <HintPath>References\ActiproSoftware.Shared.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.Addons.DotNet.WinForms">
+      <HintPath>References\ActiproSoftware.SyntaxEditor.Addons.DotNet.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.Addons.Xml.WinForms">
+      <HintPath>References\ActiproSoftware.SyntaxEditor.Addons.Xml.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.WinForms">
+      <HintPath>References\ActiproSoftware.SyntaxEditor.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Albion.Common">
+      <HintPath>References\Albion.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Albion.PhotonClient">
+      <HintPath>References\Albion.PhotonClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>References\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-UnityScript">
+      <HintPath>References\Assembly-UnityScript.dll</HintPath>
+    </Reference>
+    <Reference Include="GraphLogger">
+      <HintPath>References\GraphLogger.dll</HintPath>
+    </Reference>
+    <Reference Include="Hook">
+      <HintPath>References\Hook.dll</HintPath>
+    </Reference>
+    <Reference Include="JsonFx.Json">
+      <HintPath>References\JsonFx.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>References\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="Spline">
+      <HintPath>References\Spline.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>References\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>References\System.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security">
+      <HintPath>References\System.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <HintPath>References\System.ServiceModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>References\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>References\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>References\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>References\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

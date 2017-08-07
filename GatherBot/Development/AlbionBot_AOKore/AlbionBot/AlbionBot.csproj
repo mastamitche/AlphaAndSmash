@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ActiproSoftware.Shared.WinForms">
+      <HintPath>..\AlbionBotLibrary\References\ActiproSoftware.Shared.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.Addons.DotNet.WinForms">
+      <HintPath>..\AlbionBotLibrary\References\ActiproSoftware.SyntaxEditor.Addons.DotNet.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.Addons.Xml.WinForms">
+      <HintPath>..\AlbionBotLibrary\References\ActiproSoftware.SyntaxEditor.Addons.Xml.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.WinForms">
+      <HintPath>..\AlbionBotLibrary\References\ActiproSoftware.SyntaxEditor.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Albion.Common">
+      <HintPath>..\AlbionBotLibrary\References\Albion.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Albion.PhotonClient">
+      <HintPath>..\AlbionBotLibrary\References\Albion.PhotonClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\AlbionBotLibrary\References\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-UnityScript">
+      <HintPath>..\AlbionBotLibrary\References\Assembly-UnityScript.dll</HintPath>
+    </Reference>
+    <Reference Include="GraphLogger">
+      <HintPath>..\AlbionBotLibrary\References\GraphLogger.dll</HintPath>
+    </Reference>
+    <Reference Include="Hook">
+      <HintPath>..\AlbionBotLibrary\References\Hook.dll</HintPath>
+    </Reference>
+    <Reference Include="JsonFx.Json">
+      <HintPath>..\AlbionBotLibrary\References\JsonFx.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>..\AlbionBotLibrary\References\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="Spline">
+      <HintPath>..\AlbionBotLibrary\References\Spline.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>..\AlbionBotLibrary\References\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>..\AlbionBotLibrary\References\System.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security">
+      <HintPath>..\AlbionBotLibrary\References\System.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <HintPath>..\AlbionBotLibrary\References\System.ServiceModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>..\AlbionBotLibrary\References\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\AlbionBotLibrary\References\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>..\AlbionBotLibrary\References\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\AlbionBotLibrary\References\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
