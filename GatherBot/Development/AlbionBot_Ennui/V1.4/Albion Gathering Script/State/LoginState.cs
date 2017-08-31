@@ -1,5 +1,4 @@
-﻿
-using Ennui.Api.Script;
+﻿using Ennui.Api.Script;
 using Ennui.Api.Util;
 
 namespace Ennui.Script.Official
@@ -20,21 +19,19 @@ namespace Ennui.Script.Official
             if (!LoginWindow.IsOpen && !CharacterSelectWindow.IsOpen && !LoginErrorWindow.IsOpen)
             {
                 parent.EnterState("gather");
-				return 0;
+                return 0;
             }
 
-			if (LoginErrorWindow.IsOpen)
-			{
-				context.State = "Closing error " + LoginErrorWindow.Message;
-				LoginErrorWindow.ClickOk();
-				Time.SleepUntil(() => !LoginErrorWindow.IsOpen, 3000);
-			}
+            if (LoginErrorWindow.IsOpen)
+            {
+                context.State = "Closing error " + LoginErrorWindow.Message;
+                LoginErrorWindow.ClickOk();
+                Time.SleepUntil(() => !LoginErrorWindow.IsOpen, 3000);
+            }
 
-			if (LoginWindow.IsOpen)
+            if (LoginWindow.IsOpen)
             {
                 context.State = "Attempting to login";
-                LoginWindow.SetEmail(config.LoginEmail);
-                LoginWindow.SetPassword(config.LoginPassword);
                 LoginWindow.Login();
                 Time.SleepUntil(() => CharacterSelectWindow.IsOpen, 10000);
             }

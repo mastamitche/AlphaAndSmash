@@ -1,5 +1,4 @@
-﻿
-using Ennui.Api.Meta;
+﻿using Ennui.Api.Meta;
 using Ennui.Api.Method;
 using Ennui.Api.Object;
 using Ennui.Api.Script;
@@ -19,7 +18,6 @@ namespace Ennui.Script.Official
         private int gatherAttempts = 0;
         private List<long> blacklist = new List<long>();
         private Random rand = new Random();
-        private bool FirstLoop = false;
 
         public GatherState(Configuration config, Context context)
         {
@@ -73,7 +71,7 @@ namespace Ennui.Script.Official
             IMobObject closest = null;
             foreach (var m in mobs)
             {
-                var cdist = m.Location.SimpleDistance(center);
+                var cdist = m.ThreadSafeLocation.SimpleDistance(center);
                 if (closest == null || cdist < dist)
                 {
                     dist = cdist;
@@ -131,15 +129,15 @@ namespace Ennui.Script.Official
                 .FilterDepleted()
                 .ExcludeWithIds(blacklist.ToArray())
                 .ExcludeByArea(territoryAreas.ToArray())
-                .FilterByTypeSet(SafeTypeSet.BatchConvert(config.TypeSetsToUse))//getTypesByToolsAndConfig())) needs testing//This will get all currently not broken tools as resource collection options and what you have selected for config options
+                .FilterByTypeSet(SafeTypeSet.BatchConvert(config.TypeSetsToUse))
                 .FilterWithSetupState(HarvestableSetupState.Invalid)
                 .FilterWithSetupState(HarvestableSetupState.Owned)
                 .Closest(center);
 
             if (mobTarget != null && harvestableTarget != null)
             {
-                var mobDist = mobTarget.Location.SimpleDistance(center);
-                var resDist = harvestableTarget.Location.SimpleDistance(center);
+                var mobDist = mobTarget.ThreadSafeLocation.SimpleDistance(center);
+                var resDist = harvestableTarget.ThreadSafeLocation.SimpleDistance(center);
                 if (mobDist < resDist)
                 {
                     harvestableTarget = null;
@@ -152,29 +150,6 @@ namespace Ennui.Script.Official
 
             return harvestableTarget != null || mobTarget != null;
         }
-        //Get what i currently have
-        private List<SafeTypeSet> getTypesByTools()
-        {
-            var types = EquipmentUtils.GetCollectionTypesRemaining(Api);
-            List<SafeTypeSet> retList = new List<SafeTypeSet>();
-            foreach (KeyValuePair<ResourceType, List<int>> entry in types)
-                for (int i=0;i< entry.Value.Count; i++)
-                    retList.Add(new SafeTypeSet(entry.Value[i] + 1, entry.Value[i] + 1, entry.Key, 0 , i < entry.Value[entry.Value.Count-1] ? 3 : 0));
-            return retList;
-        }
-        //Get what i currently have and what I've selected to farm
-        private List<SafeTypeSet> getTypesByToolsAndConfig()
-        {
-            List<SafeTypeSet> allCurrentToolTypes = getTypesByTools();
-            List<SafeTypeSet> retList = new List<SafeTypeSet>();
-            foreach (var i in allCurrentToolTypes)
-                foreach (var j in config.TypeSetsToUse)
-                    if (i.Type == j.Type && i.MinTier == j.MinTier && !retList.Contains(j))
-                        retList.Add(j);
-
-            return retList;
-        }
-        
 
         private Vector3<float> RandomRoamPoint()
         {
@@ -215,7 +190,7 @@ namespace Ennui.Script.Official
 
         public override int OnLoop(IScriptEngine se)
         {
-            if (config.RepairDest != null && Api.HasBrokenItems() && (config.skipRepairing == false))
+            if (config.RepairDest != null && Api.HasBrokenItems())
             {
                 parent.EnterState("repair");
                 return 0;
@@ -236,38 +211,13 @@ namespace Ennui.Script.Official
                 return 0;
             }
 
-            var localLocation = localPlayer.Location;
-            //if (!config.GatherArea.RealArea(Api).Contains(localLocation))
+            var localLocation = localPlayer.ThreadSafeLocation;
             if (!config.ResourceArea.RealArea(Api).Contains(localLocation))
             {
                 context.State = "Walking to gather area...";
                 Logging.Log("Local player not in gather area, walk there!", LogLevel.Atom);
 
-				// MadMonk Extras
-				
-				context.State = "Walking to Exit waypoint first...";
-
-				var configb = new PointPathFindConfig();
-				configb.ClusterName = this.config.RepairClusterName;
-				configb.Point = this.config.ExitDest.RealVector3();
-				configb.UseWeb = false;
-				configb.UseMount = true;
-				Movement.PathFindTo(configb);
-
-				if (config.roamPointFirst)
-				{
-					context.State = "Walking to roam waypoint first...";
-
-					var config = new PointPathFindConfig();
-					config.ClusterName = this.config.ResourceClusterName;
-					config.Point = RandomRoamPoint();
-					config.UseWeb = false;
-					config.UseMount = true;
-					Movement.PathFindTo(config);
-					return 0;
-				}
-
-				var moveConfig = new PointPathFindConfig();
+                var moveConfig = new PointPathFindConfig();
                 moveConfig.UseWeb = false;
                 moveConfig.ClusterName = config.ResourceClusterName;
                 if (Movement.PathFindTo(moveConfig) != PathFindResult.Success)
@@ -278,19 +228,14 @@ namespace Ennui.Script.Official
 
                 return 0;
             }
-            
-			config.currentWeight = localPlayer.TotalHoldWeight;
-            var currentWeight = config.currentWeight;
-            var maxHoldWeight = config.MaxHoldWeight;
-            if (((localPlayer.TotalHoldWeight + 0.0f)/ (config.MaxHoldWeight + 0.0f)) > 1.0f)
+
+            var heldWeight = localPlayer.TotalHoldWeight;
+            if (heldWeight >= config.MaxHoldWeight)
             {
                 Logging.Log("Local player has too much weight, banking!", LogLevel.Atom);
-				
-				parent.EnterState("bank");
+                parent.EnterState("bank");
                 return 0;
             }
-
-             
 
             if (NeedsNew())
             {
@@ -315,7 +260,7 @@ namespace Ennui.Script.Official
                         var local = Players.LocalPlayer;
                         if (local != null)
                         {
-                            return FindResource(local.Location);
+                            return FindResource(local.ThreadSafeLocation);
                         }
                         return false;
                     });
@@ -358,30 +303,30 @@ namespace Ennui.Script.Official
                 {
                     context.State = "Walking to resource...";
 
-					var dist = localLocation.SimpleDistance(harvestableTarget.Location);
+                    var dist = localLocation.SimpleDistance(harvestableTarget.ThreadSafeLocation);
                     var config = new ResourcePathFindConfig();
                     config.ClusterName = this.config.ResourceClusterName;
                     config.UseWeb = false;
                     config.Target = harvestableTarget;
-					config.UseMount = ShouldUseMount(currentWeight, dist);
-					config.ExitHook = (() =>
-                     {
-                     var lpo = Players.LocalPlayer;
-                       if (lpo == null) return false;
+                    config.UseMount = ShouldUseMount(heldWeight, dist);
+                    config.ExitHook = (() =>
+                    {
+                        var lpo = Players.LocalPlayer;
+                        if (lpo == null) return false;
 
-                         if (!lpo.IsMounted && lpo.IsUnderAttack)
-                         {
-                             parent.EnterState("combat");
-                             return true;
-                         }
+                        if (!lpo.IsMounted && lpo.IsUnderAttack)
+                        {
+                            parent.EnterState("combat");
+                            return true;
+                        }
 
-                         if (!harvestableTarget.IsValid || harvestableTarget.Depleted)
-                         {
-                             return true;
-                         }
+                        if (!harvestableTarget.IsValid || harvestableTarget.Depleted)
+                        {
+                            return true;
+                        }
 
-                         return false;
-                     });
+                        return false;
+                    });
 
                     var result = Movement.PathFindTo(config);
                     if (result == PathFindResult.Failed)
@@ -395,7 +340,7 @@ namespace Ennui.Script.Official
             }
             else if (mobTarget != null)
             {
-                var mobGatherArea = mobTarget.Location.Expand(3, 3, 3);
+                var mobGatherArea = mobTarget.ThreadSafeLocation.Expand(3, 3, 3);
                 if (mobGatherArea.Contains(localLocation))
                 {
                     context.State = "Attempting to kill mob";
@@ -428,13 +373,13 @@ namespace Ennui.Script.Official
                 {
                     context.State = "Walking to mob...";
 
-                    var dist = localLocation.SimpleDistance(mobTarget.Location);
+                    var dist = localLocation.SimpleDistance(mobTarget.ThreadSafeLocation);
                     var config = new PointPathFindConfig();
                     config.ClusterName = this.config.ResourceClusterName;
                     config.UseWeb = false;
-                    config.Point = mobTarget.Location;
-					config.UseMount = ShouldUseMount(currentWeight, dist);
-					config.ExitHook = (() =>
+                    config.Point = mobTarget.ThreadSafeLocation;
+                    config.UseMount = ShouldUseMount(heldWeight, dist);
+                    config.ExitHook = (() =>
                     {
                         var lpo = Players.LocalPlayer;
                         if (lpo == null) return false;
@@ -447,9 +392,8 @@ namespace Ennui.Script.Official
 
                         if (!mobTarget.IsValid || mobTarget.CurrentHealth <= 0)
                         {
-                         return true;
-                    }
-                        
+                            return true;
+                        }
 
                         return false;
                     });

@@ -1,5 +1,4 @@
-﻿
-using Ennui.Api.Meta;
+﻿using Ennui.Api.Meta;
 using Ennui.Api.Util;
 using System.Collections.Generic;
 

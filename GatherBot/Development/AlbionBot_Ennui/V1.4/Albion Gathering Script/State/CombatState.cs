@@ -3,7 +3,6 @@ using Ennui.Api.Meta;
 using Ennui.Api.Object;
 using Ennui.Api.Script;
 using Ennui.Api.Util;
-using System.Collections.Generic;
 
 namespace Ennui.Script.Official
 {
@@ -11,132 +10,116 @@ namespace Ennui.Script.Official
     {
         private Configuration config;
         private Context context;
-		private StateMonitor<ActionState> actionStateMonitor;
-        private ISpell currentAttack =null;
+        private StateMonitor<ActionState> actionStateMonitor;
 
-		public CombatState(Configuration config, Context context)
+        public CombatState(Configuration config, Context context)
         {
             this.config = config;
             this.context = context;
         }
 
-		private void HandleSpellRotation(ILocalPlayerObject self, IEntityObject target)
-		{
-			if (!actionStateMonitor.Stamp(self.CurrentActionState))
-			{
-				context.State = "Waiting for spell cast";
-			}
-			context.State = "Casting spell!";
-
-			var buffSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Buff).First;
-			if (buffSelfSpell != null)
-			{
-				self.CastOnSelf(buffSelfSpell.Slot);
-                currentAttack = buffSelfSpell;
-                return;
-            }
-
-			var instantSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Instant).ExcludeWithName("ESCAPE_DUNGEON").First;
-			if (instantSelfSpell != null)
-			{
-				self.CastOnSelf(instantSelfSpell.Slot);
-                currentAttack = instantSelfSpell;
-                return;
-            }
-
-			var movBufSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.MovementBuff).First;
-			if (movBufSelfSpell != null)
-			{
-				self.CastOnSelf(movBufSelfSpell.Slot);
-                currentAttack = movBufSelfSpell;
-                return;
-            }
-
-			var buffEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.Buff).First;
-			if (buffEnemySpell != null)
-			{
-				self.CastOn(buffEnemySpell.Slot, target);
-                currentAttack = buffEnemySpell;
-                return;
-            }
-
-			var debuffEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.Debuff).First;
-			if (debuffEnemySpell != null)
-			{
-				self.CastOn(debuffEnemySpell.Slot, target);
-                currentAttack = debuffEnemySpell;
-                return;
-            }
-
-			var dmgEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.Damage).First;
-			if (dmgEnemySpell != null)
-			{
-				self.CastOn(dmgEnemySpell.Slot, target);
-                currentAttack = dmgEnemySpell;
-                return;
-            }
-
-			var dmgSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Damage).First;
-			if (dmgSelfSpell != null)
-			{
-				self.CastOnSelf(dmgSelfSpell.Slot);
-                currentAttack = dmgSelfSpell;
-                return;
-            }
-
-			var dmgGroundSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Ground).FilterByCategory(SpellCategory.Damage).First;
-			if (dmgGroundSpell != null)
-			{
-				self.CastAt(dmgGroundSpell.Slot, target.Location);
-                currentAttack = dmgGroundSpell;
-                return;
-            }
-
-			var crowdControlGroundSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Ground).FilterByCategory(SpellCategory.CrowdControl).First;
-			if (crowdControlGroundSpell != null)
-			{
-				self.CastAt(crowdControlGroundSpell.Slot, target.Location);
-                currentAttack = crowdControlGroundSpell;
-                return;
-            }
-
-			var crowdControlEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.CrowdControl).First;
-			if (crowdControlEnemySpell != null)
-			{
-				self.CastOn(crowdControlEnemySpell.Slot, target);
-                currentAttack = crowdControlEnemySpell;
-                return;
-            }
-
-			if (self.HealthPercentage <= 50)
-			{
-				var healSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Heal).First;
-				if (healSelfSpell != null)
-				{
-					self.CastOnSelf(healSelfSpell.Slot);
-                    currentAttack = healSelfSpell;
-                    return;
-                }
-
-				var healAllSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.All).FilterByCategory(SpellCategory.Heal).First;
-				if (healAllSpell != null)
-				{
-					self.CastOnSelf(healAllSpell.Slot);
-                    currentAttack = healAllSpell;
-                    return;
-                }
-			}
-		}
-
-		public override bool OnStart(IScriptEngine se)
-	    {
-			actionStateMonitor = new StateMonitor<ActionState>(Api, 7, ActionState.Idle, ActionState.Attacking);
-			return base.OnStart(se);
-        }
-        public bool CanIWinTheFight(IScriptEngine se)
+        private void HandleSpellRotation(ILocalPlayerObject self, IEntityObject target)
         {
-            //Could be improoved to see the tier of mobs, and own item power and do some calculations based on health, tier, being attacked, other mobs nearby
-            return Players.LocalPlayer.UnderAttackBy.Count > 1 ? false : true;
+            if (!actionStateMonitor.Stamp(self.CurrentActionState))
+            {
+                context.State = "Waiting for spell cast";
+                return;
+            }
+
+            context.State = "Casting spell!";
+
+            var buffSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Buff).First;
+            if (buffSelfSpell != null)
+            {
+                self.CastOnSelf(buffSelfSpell.Slot);
+                return;
+            }
+
+            var instantSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Instant).ExcludeWithName("ESCAPE_DUNGEON").First;
+            if (instantSelfSpell != null)
+            {
+                self.CastOnSelf(instantSelfSpell.Slot);
+                return;
+            }
+
+            var movBufSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.MovementBuff).First;
+            if (movBufSelfSpell != null)
+            {
+                self.CastOnSelf(movBufSelfSpell.Slot);
+                return;
+            }
+
+            var buffEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.Buff).First;
+            if (buffEnemySpell != null)
+            {
+                self.CastOn(buffEnemySpell.Slot, target);
+                return;
+            }
+
+            var debuffEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.Debuff).First;
+            if (debuffEnemySpell != null)
+            {
+                self.CastOn(debuffEnemySpell.Slot, target);
+                return;
+            }
+
+            var dmgEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.Damage).First;
+            if (dmgEnemySpell != null)
+            {
+                self.CastOn(dmgEnemySpell.Slot, target);
+                return;
+            }
+
+            var dmgSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Damage).First;
+            if (dmgSelfSpell != null)
+            {
+                self.CastOnSelf(dmgSelfSpell.Slot);
+                return;
+            }
+
+            var dmgGroundSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Ground).FilterByCategory(SpellCategory.Damage).First;
+            if (dmgGroundSpell != null)
+            {
+                self.CastAt(dmgGroundSpell.Slot, target.ThreadSafeLocation);
+                return;
+            }
+
+            var crowdControlGroundSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Ground).FilterByCategory(SpellCategory.CrowdControl).First;
+            if (crowdControlGroundSpell != null)
+            {
+                self.CastAt(crowdControlGroundSpell.Slot, target.ThreadSafeLocation);
+                return;
+            }
+
+            var crowdControlEnemySpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Enemy).FilterByCategory(SpellCategory.CrowdControl).First;
+            if (crowdControlEnemySpell != null)
+            {
+                self.CastOn(crowdControlEnemySpell.Slot, target);
+                return;
+            }
+
+            if (self.HealthPercentage <= 50)
+            {
+                var healSelfSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Self).FilterByCategory(SpellCategory.Heal).First;
+                if (healSelfSpell != null)
+                {
+                    self.CastOnSelf(healSelfSpell.Slot);
+                    return;
+                }
+
+                var healAllSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.All).FilterByCategory(SpellCategory.Heal).First;
+                if (healAllSpell != null)
+                {
+                    self.CastOnSelf(healAllSpell.Slot);
+                    return;
+                }
+            }
+        }
+
+        public override bool OnStart(IScriptEngine se)
+        {
+            actionStateMonitor = new StateMonitor<ActionState>(Api, 7, ActionState.Idle, ActionState.Attacking);
+            return base.OnStart(se);
         }
 
         public override int OnLoop(IScriptEngine se)
@@ -145,13 +128,12 @@ namespace Ennui.Script.Official
             if (localPlayer == null)
             {
                 context.State = "Failed to find local player!";
-                return 200;
+                return 100;
             }
-            //testing
 
-            if ( (config.FleeOnLowHealth && localPlayer.HealthPercentage <= config.FleeHealthPercent))
+            if (config.FleeOnLowHealth && localPlayer.HealthPercentage <= config.FleeHealthPercent)
             {
-				parent.EnterState("bank");
+                parent.EnterState("bank");
                 return 0;
             }
 
@@ -159,9 +141,9 @@ namespace Ennui.Script.Official
             {
                 localPlayer.ToggleMount(false);
             }
-            
-			if (localPlayer.AttackTarget == null && localPlayer.CurrentActionState != ActionState.Casting)
-			{
+
+            if (localPlayer.AttackTarget == null)
+            {
                 context.State = "Killing mob!";
 
                 var list = localPlayer.UnderAttackBy;
@@ -187,7 +169,7 @@ namespace Ennui.Script.Official
                 HandleSpellRotation(localPlayer, targ);
             }
 
-            return 100;
+            return 200;
         }
     }
 }

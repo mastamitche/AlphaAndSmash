@@ -1,5 +1,4 @@
-﻿
-using Ennui.Api.Util;
+﻿using Ennui.Api.Util;
 
 namespace Ennui.Script.Official
 {

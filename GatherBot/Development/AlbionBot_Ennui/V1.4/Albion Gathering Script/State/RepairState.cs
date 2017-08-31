@@ -1,5 +1,4 @@
-﻿
-using Ennui.Api.Method;
+﻿using Ennui.Api.Method;
 using Ennui.Api.Script;
 using Ennui.Api.Util;
 
@@ -25,82 +24,18 @@ namespace Ennui.Script.Official
                 return 10_000;
             }
 
-			if (config.enableRepairWayPoints)
-			{
-				if (!config.RepairArea.RealArea(Api).Contains(localPlayer.Location))
-				{
-					context.State = "Walking to repair area...";
-					bool reachedWP1 = false;
-					bool reachedWP2 = false;
-					bool reachedWP3 = false;
+            if (!config.RepairArea.RealArea(Api).Contains(localPlayer.ThreadSafeLocation))
+            {
+                context.State = "Walking to repair area...";
 
-					do
-					{
-						if (!reachedWP1 && !reachedWP2 && !reachedWP3)
-						{
-							context.State = "Walking to repair WP-1...";
-							var config1 = new PointPathFindConfig();
-							config1.ClusterName = this.config.RepairClusterName;
-							config1.Point = this.config.RepairWayPointOneDest.RealVector3();
-							config1.UseWeb = false;
-							config1.UseMount = true;
-							Movement.PathFindTo(config1);
-							reachedWP1 = true;
-						}
-
-						if (reachedWP1 && !reachedWP2 && !reachedWP3)
-						{
-							context.State = "Walking to repair WP-2...";
-							var config2 = new PointPathFindConfig();
-							config2.ClusterName = this.config.RepairClusterName;
-							config2.Point = this.config.RepairWayPointTwoDest.RealVector3();
-							config2.UseWeb = false;
-							config2.UseMount = true;
-							Movement.PathFindTo(config2);
-							reachedWP2 = true;
-						}
-
-						if (reachedWP1 && reachedWP2 && !reachedWP3)
-						{
-							context.State = "Walking to repair WP-3...";
-							var config3 = new PointPathFindConfig();
-							config3.ClusterName = this.config.RepairClusterName;
-							config3.Point = this.config.RepairWayPointThreeDest.RealVector3();
-							config3.UseWeb = false;
-							config3.UseMount = true;
-							Movement.PathFindTo(config3);
-							reachedWP3 = true;
-						}
-
-					} while (!reachedWP1 && !reachedWP2 && !reachedWP3);
-
-					var config = new PointPathFindConfig();
-                    //config.ClusterName = this.config.CityClusterName;
-                    config.ClusterName = this.config.RepairClusterName;
-                    config.Point = this.config.RepairDest.RealVector3();
-					config.UseWeb = false;
-					config.UseMount = true;
-					Movement.PathFindTo(config);
-					return 0;
-				}
-			}
-			else
-			{
-				if (!config.RepairArea.RealArea(Api).Contains(localPlayer.Location))
-				{
-					context.State = "Walking to repair area...";
-
-					var config = new PointPathFindConfig();
-					config.ClusterName = this.config.RepairClusterName;
-					config.Point = this.config.RepairDest.RealVector3();
-					config.UseWeb = false;
-					config.UseMount = true;
-					Movement.PathFindTo(config);
-					return 0;
-				}
-				
-			}
-
+                var config = new PointPathFindConfig();
+                config.ClusterName = this.config.RepairClusterName;
+                config.Point = this.config.RepairDest.RealVector3();
+                config.UseWeb = false;
+                config.UseMount = true;
+                Movement.PathFindTo(config);
+                return 0;
+            }
 
             if (localPlayer.IsMounted)
             {
@@ -109,68 +44,21 @@ namespace Ennui.Script.Official
 
             if (!Api.HasBrokenItems())
             {
-				if (config.enableRepairWayPoints)
-				{
-					bool reachedWP1 = false;
-					bool reachedWP2 = false;
-					bool reachedWP3 = false;
-
-					do
-					{
-						if (!reachedWP1 && !reachedWP2 && !reachedWP3)
-						{
-							context.State = "Walking to repair WP-3...";
-							var config1 = new PointPathFindConfig();
-							config1.ClusterName = this.config.RepairClusterName;
-							config1.Point = this.config.RepairWayPointThreeDest.RealVector3();
-							config1.UseWeb = false;
-							config1.UseMount = true;
-							Movement.PathFindTo(config1);
-							reachedWP3 = true;
-						}
-
-						if (!reachedWP1 && !reachedWP2 && reachedWP3)
-						{
-							context.State = "Walking to repair WP-2...";
-							var config2 = new PointPathFindConfig();
-							config2.ClusterName = this.config.RepairClusterName;
-							config2.Point = this.config.RepairWayPointTwoDest.RealVector3();
-							config2.UseWeb = false;
-							config2.UseMount = true;
-							Movement.PathFindTo(config2);
-							reachedWP2 = true;
-						}
-
-						if (!reachedWP1 && reachedWP2 && reachedWP3)
-						{
-							context.State = "Walking to repair WP-1...";
-							var config3 = new PointPathFindConfig();
-							config3.ClusterName = this.config.RepairClusterName;
-							config3.Point = this.config.RepairWayPointOneDest.RealVector3();
-							config3.UseWeb = false;
-							config3.UseMount = true;
-							Movement.PathFindTo(config3);
-							reachedWP1 = true;
-						}
-
-					} while (!reachedWP1 && !reachedWP2 && !reachedWP3);
-				}
-
-				if (localPlayer.WeighedDownPercent >= 30)
+                if (localPlayer.WeighedDownPercent >= 30)
                 {
-					parent.EnterState("bank");
-				}
+                    parent.EnterState("bank");
+                }
                 else
                 {
-					parent.EnterState("gather");	
-				}
+                    parent.EnterState("gather");
+                }
             }
 
             if (!RepairWindow.IsOpen)
             {
                 context.State = "Opening repair building...";
 
-                var building = Objects.RepairChain.Closest(localPlayer.Location);
+                var building = Objects.RepairChain.Closest(localPlayer.ThreadSafeLocation);
                 if (building == null)
                 {
                     context.State = "Failed to find repair building!";
@@ -179,9 +67,9 @@ namespace Ennui.Script.Official
 
                 building.Click();
                 Time.SleepUntil(() =>
-                  {
-                      return RepairWindow.IsOpen;
-                  }, 100);
+                {
+                    return RepairWindow.IsOpen;
+                }, 4000);
             }
 
             if (RepairWindow.IsOpen)

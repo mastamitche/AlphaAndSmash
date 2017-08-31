@@ -1,5 +1,4 @@
 ﻿using Ennui.Api;
-using Ennui.Api.Object;
 using Ennui.Api.Method;
 using Ennui.Api.Script;
 using Ennui.Api.Util;
@@ -27,12 +26,11 @@ namespace Ennui.Script.Official
                 return 10_000;
             }
 
-            if (!config.VaultArea.RealArea(Api).Contains(localPlayer.Location))
+            if (!config.VaultArea.RealArea(Api).Contains(localPlayer.ThreadSafeLocation))
             {
                 context.State = "Walking to vault...";
 
                 var config = new PointPathFindConfig();
-                //config.ClusterName = this.config.CityClusterName;
                 config.ClusterName = this.config.VaultClusterName;
                 config.UseWeb = false;
                 config.Point = this.config.VaultDest.RealVector3();
@@ -51,7 +49,7 @@ namespace Ennui.Script.Official
             {
                 context.State = "Opening vault...";
 
-                var bank = Objects.BankChain.Closest(localPlayer.Location);
+                var bank = Objects.BankChain.Closest(localPlayer.ThreadSafeLocation);
                 if (bank == null)
                 {
                     context.State = "Failed to find vault!";
@@ -67,7 +65,7 @@ namespace Ennui.Script.Official
 
             if (Banking.IsOpen)
             {
-                context.State = "Depositing items...";
+                context.State = "FDepositing items...";
 
                 var beginWeight = localPlayer.WeighedDownPercent;
                 var allItems = Inventory.GetItemsBySubstring("_ROCK", "_ORE", "_HIDE", "_WOOD", "_FIBER");
@@ -84,7 +82,7 @@ namespace Ennui.Script.Official
                 {
                     if (localPlayer.TotalHoldWeight < 99)
                     {
-                        if (config.RepairDest != null && Api.HasBrokenItems() && (config.skipRepairing == false))
+                        if (config.RepairDest != null && Api.HasBrokenItems())
                         {
                             parent.EnterState("repair");
                         }

@@ -1,5 +1,4 @@
-﻿
-using Ennui.Api.Script;
+﻿using Ennui.Api.Script;
 using Ennui.Api.Util;
 
 namespace Ennui.Script.Official
@@ -30,14 +29,13 @@ namespace Ennui.Script.Official
             var localPlayer = Players.LocalPlayer;
             if (localPlayer != null)
             {
-                if (config.RepairDest != null && Api.HasBrokenItems() && (config.skipRepairing == false))
+                if (config.RepairDest != null && Api.HasBrokenItems())
                 {
                     parent.EnterState("repair");
                 }
-                else if (localPlayer.TotalHoldWeight >= 0.0f)
+                else if (localPlayer.TotalHoldWeight >= config.MaxHoldWeight)
                 {
                     parent.EnterState("bank");
-                    Logging.Log("Entering bank state values : " + localPlayer.TotalHoldWeight+ " : "+ 0.0f, LogLevel.Error);
                 }
                 else
                 {

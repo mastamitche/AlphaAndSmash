@@ -1,27 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using Ennui.Api;
+using System.Collections.Generic;
 
 namespace Ennui.Script.Official
 {
     public class Configuration
     {
-        //public string CityClusterName = "";
         public SafeMapArea ResourceArea;
         public string ResourceClusterName = "";
 
-        //public SafeMapArea GatherArea;
         public SafeMapArea VaultArea;
-        //public SafeMapArea RepairArea;
         public SafeVector3 VaultDest;
-        public string VaultClusterName = "";      
+        public string VaultClusterName = "";
+      
         public SafeMapArea RepairArea;
         public SafeVector3 RepairDest;
         public string RepairClusterName = "";
 
         public bool AutoRelogin = false;
-        public string LoginEmail = "";
-        public string LoginPassword = "";
         public string LoginCharacterName = "";
-        public int GatherAttemptsTimeout = 2;
+        public int GatherAttemptsTimeout = 6;
 
         public bool AttackMobs = false;
         public bool IgnoreMobsOnLowHealth = true;
@@ -40,31 +37,5 @@ namespace Ennui.Script.Official
        
         public List<SafeTypeSet> TypeSetsToUse = new List<SafeTypeSet>();
         public List<SafeVector3> RoamPoints = new List<SafeVector3>();
-
-		// MadMonk Extras
-		public bool skipRepairing = false;
-		public float currentWeight = 0.0f;
-
-		public bool roamPointFirst = false;
-		public bool enableRepairWayPoints = false;
-
-		//public bool enableTwoZoneCrossing = false;
-
-		public SafeMapArea ExitArea;
-		public SafeVector3 ExitDest;
-
-		public SafeMapArea RepairWayPointOneArea;
-		public SafeMapArea RepairWayPointTwoArea;
-		public SafeMapArea RepairWayPointThreeArea;
-
-		public SafeVector3 RepairWayPointOneDest;
-		public SafeVector3 RepairWayPointTwoDest;
-		public SafeVector3 RepairWayPointThreeDest;
-
-		//public SafeMapArea interConnectOneArea;
-		//public SafeMapArea interConnectTwoArea;
-
-		//public SafeVector3 interConnectOneDest;
-		//public SafeVector3 interConnectTwoDest;
-	}
+    }
 }

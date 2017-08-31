@@ -1,7 +1,5 @@
-﻿
-using Ennui.Api.Gui;
+﻿using Ennui.Api.Gui;
 using Ennui.Api.Meta;
-using Ennui.Api.Object;
 using Ennui.Api.Script;
 using Ennui.Api.Util;
 using System;
@@ -33,29 +31,12 @@ namespace Ennui.Script.Official
         private IButton setVaultAreaButton;
         private IButton setRepairAreaButton;
         private IButton addRoamPointButton;
-		private IButton removeRoamPointButton;
+        private IButton removeRoamPointButton;
 
-		private IButton runButton;
+        private IButton runButton;
 
-		// MadMonk Extras
-		private ICheckBox skipRepairingCheckBox;
-		private ICheckBox roamPointFirstCheckBox;
-		private ICheckBox enableRepairWayPointsCheckBox;
-		//private ICheckBox twoZoneCrossingCheckBox;
-
-		private IButton setExitAreaButton;
-
-		private IButton setRepairWayPointOneButton;
-		private IButton setRepairWayPointTwoButton;
-		private IButton setRepairWayPointThreeButton;
-
-		//private IButton addFirstInterConnectButton;
-		//private IButton addFinalInterConnectButton;
-
-		private Configuration config;
+        private Configuration config;
         private Context context;
-
-        private ILocalPlayerObject localPlayer;
 
         public ConfigState(Configuration config, Context context)
         {
@@ -109,13 +90,7 @@ namespace Ennui.Script.Official
 
             characterNameInput.SetText(config.LoginCharacterName);
 
-			//MadMonk Extras
-			skipRepairingCheckBox.SetSelected(config.skipRepairing);
-			roamPointFirstCheckBox.SetSelected(config.roamPointFirst);
-			enableRepairWayPointsCheckBox.SetSelected(config.enableRepairWayPoints);
-			//twoZoneCrossingCheckBox.SetSelected(config.enableTwoZoneCrossing);
-
-			config.TypeSetsToUse.Clear();
+            config.TypeSetsToUse.Clear();
         }
 
         private void AddTiers(ResourceType type, string input)
@@ -168,15 +143,13 @@ namespace Ennui.Script.Official
 
         private void SaveConfig()
         {
-            var extention = ".json";
-            var title = "Albion_Ennui_gatherer_for_";
             try
             {
-                if (Files.Exists(title + localPlayer.Name + extention))
+                if (Files.Exists("simple-aio-gatherer.json"))
                 {
-                    Files.Delete(title + localPlayer.Name + extention);
+                    Files.Delete("simple-aio-gatherer.json");
                 }
-                Files.WriteText(title + localPlayer.Name + extention, Codecs.ToJson(config));
+                Files.WriteText("simple-aio-gatherer.json", Codecs.ToJson(config));
             }
             catch (Exception e)
             {
@@ -222,18 +195,15 @@ namespace Ennui.Script.Official
             config.GatherFiber = harvestFiberCheckBox.IsSelected();
             config.GatherHide = harvestHideCheckBox.IsSelected();
             config.GatherStone = harvestStoneCheckBox.IsSelected();
-			//config.enableTwoZoneCrossing = twoZoneCrossingCheckBox.IsSelected();
 
             config.AttackMobs = killMobsCheckBox.IsSelected();
             config.AutoRelogin = autoLoginCheckbox.IsSelected();
-            config.LoginCharacterName = localPlayer.Name;
-            //config.GatherArea = new SafeMapArea(config.ResourceClusterName, new Vector3f(-10000, -10000, -10000), new Vector3f(10000, 10000, 10000));
+            config.LoginCharacterName = characterNameInput.GetText();
             config.ResourceArea = new SafeMapArea(config.ResourceClusterName, new Vector3f(-10000, -10000, -10000), new Vector3f(10000, 10000, 10000));
-
-			// MadMonk Extras
-			config.skipRepairing = skipRepairingCheckBox.IsSelected();
-			config.roamPointFirst = roamPointFirstCheckBox.IsSelected();
-			config.enableRepairWayPoints = enableRepairWayPointsCheckBox.IsSelected();
+            if (autoLoginCheckbox.IsSelected())
+            {
+                config.LoginCharacterName = characterNameInput.GetText();
+            }
 
             SaveConfig();
 
@@ -243,117 +213,113 @@ namespace Ennui.Script.Official
 
         public override bool OnStart(IScriptEngine se)
         {
-            localPlayer = Players.LocalPlayer;
             context.State = "Configuring...";
 
             Game.Sync(() =>
             {
                 var screenSize = Game.ScreenSize;
-				int panelSize = 475;
+
                 primaryPanel = Factories.CreateGuiPanel();
                 GuiScene.Add(primaryPanel);
-                primaryPanel.SetSize(300, panelSize);
-                primaryPanel.SetPosition(155, ((screenSize.Y / 2) - 50), 0);
+                primaryPanel.SetSize(300, 320);
+                primaryPanel.SetPosition(155, (screenSize.Y / 2), 0);
                 primaryPanel.SetAnchor(new Vector2f(0.0f, 0.0f), new Vector2f(0.0f, 0.0f));
                 primaryPanel.SetPivot(new Vector2f(0.5f, 0.5f));
-				
-
-				int theEqualizer = panelSize / 2;
 
                 tierLabel = Factories.CreateGuiLabel();
                 primaryPanel.Add(tierLabel);
-                tierLabel.SetPosition(-70, (theEqualizer - 25), 0);
+                tierLabel.SetPosition(-60, 145, 0);
                 tierLabel.SetSize(100, 25);
-                tierLabel.SetText("Input Tiers");
+                tierLabel.SetText("Tier");
 
                 harvestWoodInput = Factories.CreateGuiInputField();
                 primaryPanel.Add(harvestWoodInput);
-                harvestWoodInput.SetPosition(-70, (theEqualizer - 50), 0);
+                harvestWoodInput.SetPosition(-70, 125, 0);
                 harvestWoodInput.SetSize(120, 25);
 
                 harvestWoodCheckBox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(harvestWoodCheckBox);
-                harvestWoodCheckBox.SetPosition(60, (theEqualizer - 50), 0);
+                harvestWoodCheckBox.SetPosition(60, 125, 0);
                 harvestWoodCheckBox.SetSize(100, 25);
                 harvestWoodCheckBox.SetText("Harvest Wood");
                 harvestWoodCheckBox.SetSelected(true);
 
                 harvestOreInput = Factories.CreateGuiInputField();
                 primaryPanel.Add(harvestOreInput);
-                harvestOreInput.SetPosition(-70, (theEqualizer - 75), 0);
+                harvestOreInput.SetPosition(-70, 100, 0);
                 harvestOreInput.SetSize(120, 25);
 
                 harvestOreCheckBox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(harvestOreCheckBox);
-                harvestOreCheckBox.SetPosition(60, (theEqualizer - 75), 0);
+                harvestOreCheckBox.SetPosition(60, 100, 0);
                 harvestOreCheckBox.SetSize(100, 25);
                 harvestOreCheckBox.SetText("Harvest Ore");
                 harvestOreCheckBox.SetSelected(true);
 
                 harvestFiberInput = Factories.CreateGuiInputField();
                 primaryPanel.Add(harvestFiberInput);
-                harvestFiberInput.SetPosition(-70, (theEqualizer - 100), 0);
+                harvestFiberInput.SetPosition(-70, 75, 0);
                 harvestFiberInput.SetSize(120, 25);
 
                 harvestFiberCheckBox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(harvestFiberCheckBox);
-                harvestFiberCheckBox.SetPosition(60, (theEqualizer - 100), 0);
+                harvestFiberCheckBox.SetPosition(60, 75, 0);
                 harvestFiberCheckBox.SetSize(100, 25);
                 harvestFiberCheckBox.SetText("Harvest Fiber");
                 harvestFiberCheckBox.SetSelected(true);
 
                 harvestHideInput = Factories.CreateGuiInputField();
                 primaryPanel.Add(harvestHideInput);
-                harvestHideInput.SetPosition(-70, (theEqualizer - 125), 0);
+                harvestHideInput.SetPosition(-70, 50, 0);
                 harvestHideInput.SetSize(120, 25);
 
                 harvestHideCheckBox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(harvestHideCheckBox);
-                harvestHideCheckBox.SetPosition(60, (theEqualizer - 125), 0);
+                harvestHideCheckBox.SetPosition(60, 50, 0);
                 harvestHideCheckBox.SetSize(100, 25);
                 harvestHideCheckBox.SetText("Harvest Hide");
                 harvestHideCheckBox.SetSelected(true);
 
                 harvestStoneInput = Factories.CreateGuiInputField();
                 primaryPanel.Add(harvestStoneInput);
-                harvestStoneInput.SetPosition(-70, (theEqualizer - 150), 0);
+                harvestStoneInput.SetPosition(-70, 25, 0);
                 harvestStoneInput.SetSize(120, 25);
 
                 harvestStoneCheckBox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(harvestStoneCheckBox);
-                harvestStoneCheckBox.SetPosition(60, (theEqualizer - 150), 0);
+                harvestStoneCheckBox.SetPosition(60, 25, 0);
                 harvestStoneCheckBox.SetSize(100, 25);
                 harvestStoneCheckBox.SetText("Harvest Stone");
                 harvestStoneCheckBox.SetSelected(true);
 
                 killMobsCheckBox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(killMobsCheckBox);
-                killMobsCheckBox.SetPosition(-70, (theEqualizer - 175), 0);
+                killMobsCheckBox.SetPosition(-70, -5, 0);
                 killMobsCheckBox.SetSize(125, 25);
                 killMobsCheckBox.SetText("Kill Mobs");
                 killMobsCheckBox.SetSelected(true);
 
                 autoLoginCheckbox = Factories.CreateGuiCheckBox();
                 primaryPanel.Add(autoLoginCheckbox);
-                autoLoginCheckbox.SetPosition(60, (theEqualizer - 175), 0);
+                autoLoginCheckbox.SetPosition(60, -5, 0);
                 autoLoginCheckbox.SetSize(125, 25);
                 autoLoginCheckbox.SetText("Auto Relogin");
                 autoLoginCheckbox.SetSelected(true);
 
                 characterNameLabel = Factories.CreateGuiLabel();
                 primaryPanel.Add(characterNameLabel);
-                characterNameLabel.SetPosition(70, (theEqualizer - 200), 0);
+                characterNameLabel.SetPosition(70, -35, 0);
                 characterNameLabel.SetSize(125, 25);
                 characterNameLabel.SetText("Character Name");
 
                 characterNameInput = Factories.CreateGuiInputField();
                 primaryPanel.Add(characterNameInput);
-                characterNameInput.SetPosition(70, (theEqualizer - 225), 0);
+                characterNameInput.SetPosition(70, -55, 0);
                 characterNameInput.SetSize(125, 25);
 
                 setVaultAreaButton = Factories.CreateGuiButton();
                 primaryPanel.Add(setVaultAreaButton);
-                setVaultAreaButton.SetPosition(-70, (theEqualizer - 200), 0);
+                setVaultAreaButton.SetPosition(-70, -35, 0);
                 setVaultAreaButton.SetSize(125, 25);
                 setVaultAreaButton.SetText("Set Vault Loc.");
                 setVaultAreaButton.AddActionListener((e) =>
@@ -361,10 +327,9 @@ namespace Ennui.Script.Official
                     var local = Players.LocalPlayer;
                     if (local != null)
                     {
-                        var loc = local.Location;
+                        var loc = local.ThreadSafeLocation;
                         var area = loc.Expand(4, 2, 4);
                         Logging.Log("Set vault loc to " + loc.X + " " + loc.Y + " " + loc.Z);
-                        //config.CityClusterName = Game.ClusterName;
                         config.VaultClusterName = Game.ClusterName;
                         config.VaultDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
                         config.VaultArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
@@ -373,7 +338,7 @@ namespace Ennui.Script.Official
 
                 setRepairAreaButton = Factories.CreateGuiButton();
                 primaryPanel.Add(setRepairAreaButton);
-                setRepairAreaButton.SetPosition(-70, (theEqualizer - 225), 0);
+                setRepairAreaButton.SetPosition(-70, -65, 0);
                 setRepairAreaButton.SetSize(125, 25);
                 setRepairAreaButton.SetText("Set Repair Loc.");
                 setRepairAreaButton.AddActionListener((e) =>
@@ -381,10 +346,9 @@ namespace Ennui.Script.Official
                     var local = Players.LocalPlayer;
                     if (local != null)
                     {
-                        var loc = local.Location;
+                        var loc = local.ThreadSafeLocation;
                         var area = loc.Expand(4, 2, 4);
                         Logging.Log("Set repair loc to " + loc.X + " " + loc.Y + " " + loc.Z);
-                        //config.CityClusterName = Game.ClusterName;
                         config.RepairClusterName = Game.ClusterName;
                         config.RepairDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
                         config.RepairArea = new SafeMapArea(Game.ClusterName, new Area(area.Start, area.End));
@@ -393,7 +357,7 @@ namespace Ennui.Script.Official
 
                 addRoamPointButton = Factories.CreateGuiButton();
                 primaryPanel.Add(addRoamPointButton);
-                addRoamPointButton.SetPosition(-70, (theEqualizer - 250), 0);
+                addRoamPointButton.SetPosition(-70, -95, 0);
                 addRoamPointButton.SetSize(125, 25);
                 addRoamPointButton.SetText("Add Roam Point");
                 addRoamPointButton.AddActionListener((e) =>
@@ -401,79 +365,39 @@ namespace Ennui.Script.Official
                     var local = Players.LocalPlayer;
                     if (local != null)
                     {
-                        var loc = local.Location;
+                        var loc = local.ThreadSafeLocation;
                         Logging.Log("Add roam point " + loc.X + " " + loc.Y + " " + loc.Z);
                         config.ResourceClusterName = Game.ClusterName;
                         config.RoamPoints.Add(new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z)));
                     }
                 });
 
-				removeRoamPointButton = Factories.CreateGuiButton();
-				primaryPanel.Add(removeRoamPointButton);
-				removeRoamPointButton.SetPosition(70, (theEqualizer - 300), 0);
-				removeRoamPointButton.SetSize(125, 25);
-				removeRoamPointButton.SetText("Del Roam Point");
-				removeRoamPointButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						Logging.Log("Delete roam point " + loc.X + " " + loc.Y + " " + loc.Z);
-						for (var i = 0; i < config.RoamPoints.Count; i++)
-						{
-							if (config.RoamPoints[i].RealVector3().Expand(3, 3, 3).Contains(loc))
-							{
-								config.RoamPoints.RemoveAt(i);
-								i -= 1;
-							}
-						}
-					}
-				});
+                removeRoamPointButton = Factories.CreateGuiButton();
+                primaryPanel.Add(removeRoamPointButton);
+                removeRoamPointButton.SetPosition(60, -95, 0);
+                removeRoamPointButton.SetSize(125, 25);
+                removeRoamPointButton.SetText("Del Roam Point");
+                removeRoamPointButton.AddActionListener((e) =>
+                {
+                    var local = Players.LocalPlayer;
+                    if (local != null)
+                    {
+                        var loc = local.ThreadSafeLocation;
+                        Logging.Log("Delete roam point " + loc.X + " " + loc.Y + " " + loc.Z);
+                        for (var i = 0; i < config.RoamPoints.Count; i++)
+                        {
+                            if (config.RoamPoints[i].RealVector3().Expand(3, 3, 3).Contains(loc))
+                            {
+                                config.RoamPoints.RemoveAt(i);
+                                i -= 1;
+                            }
+                        }
+                    }
+                });
 
-				/*
-				addFirstInterConnectButton = Factories.CreateGuiButton();
-				primaryPanel.Add(addFirstInterConnectButton);
-				addFirstInterConnectButton.SetPosition(-70, (theEqualizer - 400), 0);
-				addFirstInterConnectButton.SetSize(125, 25);
-				addFirstInterConnectButton.SetText("Add First LWP");
-				addFirstInterConnectButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						var area = loc.Expand(4, 2, 4);
-						Logging.Log("Set First LWP to " + loc.X + " " + loc.Y + " " + loc.Z);
-						config.CityClusterName = Game.ClusterName;
-						config.interConnectOneDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
-						config.interConnectOneArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
-					}
-				});
-
-				addFinalInterConnectButton = Factories.CreateGuiButton();
-				primaryPanel.Add(addFinalInterConnectButton);
-				addFinalInterConnectButton.SetPosition(70, (theEqualizer - 400), 0);
-				addFinalInterConnectButton.SetSize(125, 25);
-				addFinalInterConnectButton.SetText("Add Final LWP");
-				addFinalInterConnectButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						var area = loc.Expand(4, 2, 4);
-						Logging.Log("Set First LWP to " + loc.X + " " + loc.Y + " " + loc.Z);
-						config.CityClusterName = Game.ClusterName;
-						config.interConnectTwoDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
-						config.interConnectTwoArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
-					}
-				});
-				*/
-
-				runButton = Factories.CreateGuiButton();
+                runButton = Factories.CreateGuiButton();
                 primaryPanel.Add(runButton);
-                runButton.SetPosition(0, (theEqualizer - 450), 0);
+                runButton.SetPosition(0, -140, 0);
                 runButton.SetSize(125, 25);
                 runButton.SetText("Run");
                 runButton.AddActionListener((e) =>
@@ -490,140 +414,8 @@ namespace Ennui.Script.Official
                         return;
                     }
 
-					// Checks if custom waypoints exist or not
-					if (config.ExitDest == null)
-					{
-						context.State = "No exit waypoint set!";
-						return;
-					}
-
-					if (config.RepairWayPointOneDest == null)
-					{
-						context.State = "WP-1 Not Set!";
-						return;
-					}
-					if (config.RepairWayPointTwoDest == null)
-					{
-						context.State = "WP-2 Not Set!";
-						return;
-					}
-
-					if (config.RepairWayPointThreeDest == null)
-					{
-						context.State = "WP-3 Not Set!";
-						return;
-					}
-					// End of MadMonk Extras
-
-					SelectedStart();
+                    SelectedStart();
                 });
-
-				// MadMonk Extras
-				skipRepairingCheckBox = Factories.CreateGuiCheckBox();
-				primaryPanel.Add(skipRepairingCheckBox);
-				skipRepairingCheckBox.SetPosition(-70, (theEqualizer - 325), 0);
-				skipRepairingCheckBox.SetSize(100, 25);
-				skipRepairingCheckBox.SetText("Skip Repairing");
-				skipRepairingCheckBox.SetSelected(false);
-
-				roamPointFirstCheckBox = Factories.CreateGuiCheckBox();
-				primaryPanel.Add(roamPointFirstCheckBox);
-				roamPointFirstCheckBox.SetPosition(-70, (theEqualizer - 350), 0);
-				roamPointFirstCheckBox.SetSize(100, 25);
-				roamPointFirstCheckBox.SetText("Roam Point First");
-				roamPointFirstCheckBox.SetSelected(false);
-
-				setExitAreaButton = Factories.CreateGuiButton();
-				primaryPanel.Add(setExitAreaButton);
-				setExitAreaButton.SetPosition(70, (theEqualizer - 250), 0);
-				setExitAreaButton.SetSize(125, 25);
-				setExitAreaButton.SetText("Set Exit Loc.");
-				setExitAreaButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						var area = loc.Expand(4, 2, 4);
-						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
-						config.RepairClusterName = Game.ClusterName;
-						config.ExitDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
-						config.ExitArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
-					}
-				});
-
-				setRepairWayPointOneButton = Factories.CreateGuiButton();
-				primaryPanel.Add(setRepairWayPointOneButton);
-				setRepairWayPointOneButton.SetPosition(-70, (theEqualizer - 275), 0);
-				setRepairWayPointOneButton.SetSize(125, 25);
-				setRepairWayPointOneButton.SetText("Set RWP-1 Loc.");
-				setRepairWayPointOneButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						var area = loc.Expand(4, 2, 4);
-						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
-						config.RepairClusterName = Game.ClusterName;
-						config.RepairWayPointOneDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
-						config.RepairWayPointOneArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
-					}
-				});
-
-				setRepairWayPointTwoButton = Factories.CreateGuiButton();
-				primaryPanel.Add(setRepairWayPointTwoButton);
-				setRepairWayPointTwoButton.SetPosition(70, (theEqualizer - 275), 0);
-				setRepairWayPointTwoButton.SetSize(125, 25);
-				setRepairWayPointTwoButton.SetText("Set RWP-2 Loc.");
-				setRepairWayPointTwoButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						var area = loc.Expand(4, 2, 4);
-						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
-						config.RepairClusterName = Game.ClusterName;
-						config.RepairWayPointTwoDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
-						config.RepairWayPointTwoArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
-					}
-				});
-
-				setRepairWayPointThreeButton = Factories.CreateGuiButton();
-				primaryPanel.Add(setRepairWayPointThreeButton);
-				setRepairWayPointThreeButton.SetPosition(-70, (theEqualizer - 300), 0);
-				setRepairWayPointThreeButton.SetSize(125, 25);
-				setRepairWayPointThreeButton.SetText("Set RWP-3 Loc.");
-				setRepairWayPointThreeButton.AddActionListener((e) =>
-				{
-					var local = Players.LocalPlayer;
-					if (local != null)
-					{
-						var loc = local.Location;
-						var area = loc.Expand(4, 2, 4);
-						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
-						config.RepairClusterName = Game.ClusterName;
-						config.RepairWayPointThreeDest = new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z));
-						config.RepairWayPointThreeArea = new SafeMapArea(Game.Cluster.Name, new Area(area.Start, area.End));
-					}
-				});
-
-				enableRepairWayPointsCheckBox = Factories.CreateGuiCheckBox();
-				primaryPanel.Add(enableRepairWayPointsCheckBox);
-				enableRepairWayPointsCheckBox.SetPosition(-70, (theEqualizer - 375), 0);
-				enableRepairWayPointsCheckBox.SetSize(100, 25);
-				enableRepairWayPointsCheckBox.SetText("Enable 3-Step Repairing");
-				enableRepairWayPointsCheckBox.SetSelected(false);
-
-                /*
-				twoZoneCrossingCheckBox = Factories.CreateGuiCheckBox();
-				primaryPanel.Add(twoZoneCrossingCheckBox);
-				twoZoneCrossingCheckBox.SetPosition(-70, (theEqualizer - 425), 0);
-				twoZoneCrossingCheckBox.SetSize(100, 25);
-				twoZoneCrossingCheckBox.SetText("Enable 2-Zone Crossing");
-				twoZoneCrossingCheckBox.SetSelected(false);
-				*/
 
                 UpdateForConfig();
             });
@@ -634,8 +426,14 @@ namespace Ennui.Script.Official
         public override int OnLoop(IScriptEngine se)
         {
             var lpo = Players.LocalPlayer;
-            if (lpo != null && config.MaxHoldWeight < lpo.MaxCarryWeight)
-                config.MaxHoldWeight = lpo.MaxCarryWeight;
+            if (lpo != null)
+            {
+                var max = lpo.MaxCarryWeight;
+                if (max >= config.MaxHoldWeight)
+                {
+                    config.MaxHoldWeight = max;
+                }
+            }
             return 100;
         }
     }
