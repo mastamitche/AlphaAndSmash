@@ -32,6 +32,8 @@ namespace Ennui.Script.Official
             if (LoginWindow.IsOpen)
             {
                 context.State = "Attempting to login";
+                LoginWindow.SetEmail(config.LoginEmail);
+                LoginWindow.SetPassword(config.LoginPassword);
                 LoginWindow.Login();
                 Time.SleepUntil(() => CharacterSelectWindow.IsOpen, 10000);
             }

@@ -143,13 +143,15 @@ namespace Ennui.Script.Official
 
         private void SaveConfig()
         {
+            var extention = ".json";
+            var title = "Albion_Ennui_gatherer_for_";
             try
             {
-                if (Files.Exists("simple-aio-gatherer.json"))
+                if (Files.Exists(title + localPlayer.Name + extention))
                 {
-                    Files.Delete("simple-aio-gatherer.json");
+                    Files.Delete(title + localPlayer.Name + extention);
                 }
-                Files.WriteText("simple-aio-gatherer.json", Codecs.ToJson(config));
+                Files.WriteText(title + localPlayer.Name + extention, Codecs.ToJson(config));
             }
             catch (Exception e)
             {
@@ -200,10 +202,6 @@ namespace Ennui.Script.Official
             config.AutoRelogin = autoLoginCheckbox.IsSelected();
             config.LoginCharacterName = characterNameInput.GetText();
             config.ResourceArea = new SafeMapArea(config.ResourceClusterName, new Vector3f(-10000, -10000, -10000), new Vector3f(10000, 10000, 10000));
-            if (autoLoginCheckbox.IsSelected())
-            {
-                config.LoginCharacterName = characterNameInput.GetText();
-            }
 
             SaveConfig();
 

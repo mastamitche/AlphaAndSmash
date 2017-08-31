@@ -17,6 +17,8 @@ namespace Ennui.Script.Official
         public string RepairClusterName = "";
 
         public bool AutoRelogin = false;
+        public string LoginEmail = "";
+        public string LoginPassword = "";
         public string LoginCharacterName = "";
         public int GatherAttemptsTimeout = 6;
 
@@ -37,5 +39,6 @@ namespace Ennui.Script.Official
        
         public List<SafeTypeSet> TypeSetsToUse = new List<SafeTypeSet>();
         public List<SafeVector3> RoamPoints = new List<SafeVector3>();
+		public bool skipRepairing = false;
     }
 }
