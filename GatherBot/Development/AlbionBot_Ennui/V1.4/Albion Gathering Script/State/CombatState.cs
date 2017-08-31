@@ -1,7 +1,9 @@
 ﻿using Ennui.Api;
-using Ennui.Api.Direct.Object;
 using Ennui.Api.Meta;
+using Ennui.Api.Object;
 using Ennui.Api.Script;
+using Ennui.Api.Util;
+using System.Collections.Generic;
 
 namespace Ennui.Script.Official
 {
@@ -10,6 +12,7 @@ namespace Ennui.Script.Official
         private Configuration config;
         private Context context;
 		private StateMonitor<ActionState> actionStateMonitor;
+        private ISpell currentAttack =null;
 
 		public CombatState(Configuration config, Context context)
         {
@@ -29,6 +32,7 @@ namespace Ennui.Script.Official
 			if (buffSelfSpell != null)
 			{
 				self.CastOnSelf(buffSelfSpell.Slot);
+                currentAttack = buffSelfSpell;
                 return;
             }
 
@@ -36,6 +40,7 @@ namespace Ennui.Script.Official
 			if (instantSelfSpell != null)
 			{
 				self.CastOnSelf(instantSelfSpell.Slot);
+                currentAttack = instantSelfSpell;
                 return;
             }
 
@@ -43,6 +48,7 @@ namespace Ennui.Script.Official
 			if (movBufSelfSpell != null)
 			{
 				self.CastOnSelf(movBufSelfSpell.Slot);
+                currentAttack = movBufSelfSpell;
                 return;
             }
 
@@ -50,6 +56,7 @@ namespace Ennui.Script.Official
 			if (buffEnemySpell != null)
 			{
 				self.CastOn(buffEnemySpell.Slot, target);
+                currentAttack = buffEnemySpell;
                 return;
             }
 
@@ -57,6 +64,7 @@ namespace Ennui.Script.Official
 			if (debuffEnemySpell != null)
 			{
 				self.CastOn(debuffEnemySpell.Slot, target);
+                currentAttack = debuffEnemySpell;
                 return;
             }
 
@@ -64,6 +72,7 @@ namespace Ennui.Script.Official
 			if (dmgEnemySpell != null)
 			{
 				self.CastOn(dmgEnemySpell.Slot, target);
+                currentAttack = dmgEnemySpell;
                 return;
             }
 
@@ -71,20 +80,23 @@ namespace Ennui.Script.Official
 			if (dmgSelfSpell != null)
 			{
 				self.CastOnSelf(dmgSelfSpell.Slot);
+                currentAttack = dmgSelfSpell;
                 return;
             }
 
 			var dmgGroundSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Ground).FilterByCategory(SpellCategory.Damage).First;
 			if (dmgGroundSpell != null)
 			{
-				self.CastAt(dmgGroundSpell.Slot, target.ThreadSafeLocation);
+				self.CastAt(dmgGroundSpell.Slot, target.Location);
+                currentAttack = dmgGroundSpell;
                 return;
             }
 
 			var crowdControlGroundSpell = self.SpellChain.FilterByReady().FilterByTarget(SpellTarget.Ground).FilterByCategory(SpellCategory.CrowdControl).First;
 			if (crowdControlGroundSpell != null)
 			{
-				self.CastAt(crowdControlGroundSpell.Slot, target.ThreadSafeLocation);
+				self.CastAt(crowdControlGroundSpell.Slot, target.Location);
+                currentAttack = crowdControlGroundSpell;
                 return;
             }
 
@@ -92,6 +104,7 @@ namespace Ennui.Script.Official
 			if (crowdControlEnemySpell != null)
 			{
 				self.CastOn(crowdControlEnemySpell.Slot, target);
+                currentAttack = crowdControlEnemySpell;
                 return;
             }
 
@@ -101,6 +114,7 @@ namespace Ennui.Script.Official
 				if (healSelfSpell != null)
 				{
 					self.CastOnSelf(healSelfSpell.Slot);
+                    currentAttack = healSelfSpell;
                     return;
                 }
 
@@ -108,6 +122,7 @@ namespace Ennui.Script.Official
 				if (healAllSpell != null)
 				{
 					self.CastOnSelf(healAllSpell.Slot);
+                    currentAttack = healAllSpell;
                     return;
                 }
 			}
@@ -117,7 +132,12 @@ namespace Ennui.Script.Official
 	    {
 			actionStateMonitor = new StateMonitor<ActionState>(Api, 7, ActionState.Idle, ActionState.Attacking);
 			return base.OnStart(se);
-		}
+        }
+        public bool CanIWinTheFight(IScriptEngine se)
+        {
+            //Could be improoved to see the tier of mobs, and own item power and do some calculations based on health, tier, being attacked, other mobs nearby
+            return Players.LocalPlayer.UnderAttackBy.Count > 1 ? false : true;
+        }
 
         public override int OnLoop(IScriptEngine se)
         {
@@ -127,8 +147,9 @@ namespace Ennui.Script.Official
                 context.State = "Failed to find local player!";
                 return 200;
             }
+            //testing
 
-            if (config.FleeOnLowHealth && localPlayer.HealthPercentage <= config.FleeHealthPercent)
+            if ( (config.FleeOnLowHealth && localPlayer.HealthPercentage <= config.FleeHealthPercent))
             {
 				parent.EnterState("bank");
                 return 0;
@@ -138,8 +159,7 @@ namespace Ennui.Script.Official
             {
                 localPlayer.ToggleMount(false);
             }
-
-			//if (localPlayer.AttackTarget == null)
+            
 			if (localPlayer.AttackTarget == null && localPlayer.CurrentActionState != ActionState.Casting)
 			{
                 context.State = "Killing mob!";

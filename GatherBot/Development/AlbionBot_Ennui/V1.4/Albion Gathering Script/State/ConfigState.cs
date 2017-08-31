@@ -1,8 +1,9 @@
-﻿using Ennui.Api;
-using Ennui.Api.Builder;
+﻿
 using Ennui.Api.Gui;
 using Ennui.Api.Meta;
+using Ennui.Api.Object;
 using Ennui.Api.Script;
+using Ennui.Api.Util;
 using System;
 using System.Collections.Generic;
 
@@ -53,6 +54,8 @@ namespace Ennui.Script.Official
 
 		private Configuration config;
         private Context context;
+
+        private ILocalPlayerObject localPlayer;
 
         public ConfigState(Configuration config, Context context)
         {
@@ -165,13 +168,15 @@ namespace Ennui.Script.Official
 
         private void SaveConfig()
         {
+            var extention = ".json";
+            var title = "Albion_Ennui_gatherer_for_";
             try
             {
-                if (Files.Exists("simple-aio-gatherer.json"))
+                if (Files.Exists(title + localPlayer.Name + extention))
                 {
-                    Files.Delete("simple-aio-gatherer.json");
+                    Files.Delete(title + localPlayer.Name + extention);
                 }
-                Files.WriteText("simple-aio-gatherer.json", Codecs.ToJson(config));
+                Files.WriteText(title + localPlayer.Name + extention, Codecs.ToJson(config));
             }
             catch (Exception e)
             {
@@ -221,14 +226,9 @@ namespace Ennui.Script.Official
 
             config.AttackMobs = killMobsCheckBox.IsSelected();
             config.AutoRelogin = autoLoginCheckbox.IsSelected();
-            config.LoginCharacterName = characterNameInput.GetText();
+            config.LoginCharacterName = localPlayer.Name;
             //config.GatherArea = new SafeMapArea(config.ResourceClusterName, new Vector3f(-10000, -10000, -10000), new Vector3f(10000, 10000, 10000));
             config.ResourceArea = new SafeMapArea(config.ResourceClusterName, new Vector3f(-10000, -10000, -10000), new Vector3f(10000, 10000, 10000));
- 
-            if (autoLoginCheckbox.IsSelected())
-            {
-                config.LoginCharacterName = characterNameInput.GetText();
-            }
 
 			// MadMonk Extras
 			config.skipRepairing = skipRepairingCheckBox.IsSelected();
@@ -243,6 +243,7 @@ namespace Ennui.Script.Official
 
         public override bool OnStart(IScriptEngine se)
         {
+            localPlayer = Players.LocalPlayer;
             context.State = "Configuring...";
 
             Game.Sync(() =>
@@ -360,7 +361,7 @@ namespace Ennui.Script.Official
                     var local = Players.LocalPlayer;
                     if (local != null)
                     {
-                        var loc = local.ThreadSafeLocation;
+                        var loc = local.Location;
                         var area = loc.Expand(4, 2, 4);
                         Logging.Log("Set vault loc to " + loc.X + " " + loc.Y + " " + loc.Z);
                         //config.CityClusterName = Game.ClusterName;
@@ -380,7 +381,7 @@ namespace Ennui.Script.Official
                     var local = Players.LocalPlayer;
                     if (local != null)
                     {
-                        var loc = local.ThreadSafeLocation;
+                        var loc = local.Location;
                         var area = loc.Expand(4, 2, 4);
                         Logging.Log("Set repair loc to " + loc.X + " " + loc.Y + " " + loc.Z);
                         //config.CityClusterName = Game.ClusterName;
@@ -400,7 +401,7 @@ namespace Ennui.Script.Official
                     var local = Players.LocalPlayer;
                     if (local != null)
                     {
-                        var loc = local.ThreadSafeLocation;
+                        var loc = local.Location;
                         Logging.Log("Add roam point " + loc.X + " " + loc.Y + " " + loc.Z);
                         config.ResourceClusterName = Game.ClusterName;
                         config.RoamPoints.Add(new SafeVector3(new Vector3f(loc.X, loc.Y, loc.Z)));
@@ -417,7 +418,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						Logging.Log("Delete roam point " + loc.X + " " + loc.Y + " " + loc.Z);
 						for (var i = 0; i < config.RoamPoints.Count; i++)
 						{
@@ -441,7 +442,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						var area = loc.Expand(4, 2, 4);
 						Logging.Log("Set First LWP to " + loc.X + " " + loc.Y + " " + loc.Z);
 						config.CityClusterName = Game.ClusterName;
@@ -460,7 +461,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						var area = loc.Expand(4, 2, 4);
 						Logging.Log("Set First LWP to " + loc.X + " " + loc.Y + " " + loc.Z);
 						config.CityClusterName = Game.ClusterName;
@@ -542,7 +543,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						var area = loc.Expand(4, 2, 4);
 						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
 						config.RepairClusterName = Game.ClusterName;
@@ -561,7 +562,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						var area = loc.Expand(4, 2, 4);
 						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
 						config.RepairClusterName = Game.ClusterName;
@@ -580,7 +581,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						var area = loc.Expand(4, 2, 4);
 						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
 						config.RepairClusterName = Game.ClusterName;
@@ -599,7 +600,7 @@ namespace Ennui.Script.Official
 					var local = Players.LocalPlayer;
 					if (local != null)
 					{
-						var loc = local.ThreadSafeLocation;
+						var loc = local.Location;
 						var area = loc.Expand(4, 2, 4);
 						Logging.Log("Set exit loc to " + loc.X + " " + loc.Y + " " + loc.Z);
 						config.RepairClusterName = Game.ClusterName;
@@ -615,7 +616,7 @@ namespace Ennui.Script.Official
 				enableRepairWayPointsCheckBox.SetText("Enable 3-Step Repairing");
 				enableRepairWayPointsCheckBox.SetSelected(false);
 
-				/*
+                /*
 				twoZoneCrossingCheckBox = Factories.CreateGuiCheckBox();
 				primaryPanel.Add(twoZoneCrossingCheckBox);
 				twoZoneCrossingCheckBox.SetPosition(-70, (theEqualizer - 425), 0);
@@ -623,7 +624,8 @@ namespace Ennui.Script.Official
 				twoZoneCrossingCheckBox.SetText("Enable 2-Zone Crossing");
 				twoZoneCrossingCheckBox.SetSelected(false);
 				*/
-				UpdateForConfig();
+
+                UpdateForConfig();
             });
 
             return true;
@@ -632,14 +634,8 @@ namespace Ennui.Script.Official
         public override int OnLoop(IScriptEngine se)
         {
             var lpo = Players.LocalPlayer;
-            if (lpo != null)
-            {
-                var max = lpo.MaxCarryWeight;
-                if (max >= config.MaxHoldWeight)
-                {
-                    config.MaxHoldWeight = max;
-                }
-            }
+            if (lpo != null && config.MaxHoldWeight < lpo.MaxCarryWeight)
+                config.MaxHoldWeight = lpo.MaxCarryWeight;
             return 100;
         }
     }

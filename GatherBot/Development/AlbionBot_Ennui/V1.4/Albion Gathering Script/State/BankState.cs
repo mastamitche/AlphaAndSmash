@@ -1,7 +1,8 @@
 ﻿using Ennui.Api;
-using Ennui.Api.Direct;
+using Ennui.Api.Object;
 using Ennui.Api.Method;
 using Ennui.Api.Script;
+using Ennui.Api.Util;
 using System.Collections.Generic;
 
 namespace Ennui.Script.Official
@@ -26,7 +27,7 @@ namespace Ennui.Script.Official
                 return 10_000;
             }
 
-            if (!config.VaultArea.RealArea(Api).Contains(localPlayer.ThreadSafeLocation))
+            if (!config.VaultArea.RealArea(Api).Contains(localPlayer.Location))
             {
                 context.State = "Walking to vault...";
 
@@ -50,7 +51,7 @@ namespace Ennui.Script.Official
             {
                 context.State = "Opening vault...";
 
-                var bank = Objects.BankChain.Closest(localPlayer.ThreadSafeLocation);
+                var bank = Objects.BankChain.Closest(localPlayer.Location);
                 if (bank == null)
                 {
                     context.State = "Failed to find vault!";

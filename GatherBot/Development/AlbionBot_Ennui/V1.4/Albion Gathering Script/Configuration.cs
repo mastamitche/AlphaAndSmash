@@ -1,6 +1,4 @@
-﻿using Ennui.Api;
-using Ennui.Api.Builder;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Ennui.Script.Official
 {
@@ -20,6 +18,8 @@ namespace Ennui.Script.Official
         public string RepairClusterName = "";
 
         public bool AutoRelogin = false;
+        public string LoginEmail = "";
+        public string LoginPassword = "";
         public string LoginCharacterName = "";
         public int GatherAttemptsTimeout = 2;
 

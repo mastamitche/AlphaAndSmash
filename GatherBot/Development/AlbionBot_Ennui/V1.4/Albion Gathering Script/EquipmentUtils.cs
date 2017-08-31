@@ -51,12 +51,12 @@ namespace Ennui.Script.Official
         public static List<KeyValuePair<ResourceType, List<int>>> GetCollectionTypesRemaining(this IApi api)
         {
             //Find all tools
-            List<Api.Direct.IItemStack> axes = api.Inventory.GetItemsBySubstring(" axe");
-            List<Api.Direct.IItemStack> picks = api.Inventory.GetItemsBySubstring("pickaxe");
-            List<Api.Direct.IItemStack> knives = api.Inventory.GetItemsBySubstring("knife");
-            List<Api.Direct.IItemStack> hammers = api.Inventory.GetItemsBySubstring("hammer");
-            List<Api.Direct.IItemStack> sickles = api.Inventory.GetItemsBySubstring("sickle");
-            List<List<Api.Direct.IItemStack>> allTools = new List<List<Api.Direct.IItemStack>> { axes, picks, knives, hammers, sickles };
+            List<IItemStack> axes = api.Inventory.GetItemsBySubstring(" axe");
+            List<IItemStack> picks = api.Inventory.GetItemsBySubstring("pickaxe");
+            List<IItemStack> knives = api.Inventory.GetItemsBySubstring("knife");
+            List<IItemStack> hammers = api.Inventory.GetItemsBySubstring("hammer");
+            List<IItemStack> sickles = api.Inventory.GetItemsBySubstring("sickle");
+            List<List<IItemStack>> allTools = new List<List<IItemStack>> { axes, picks, knives, hammers, sickles };
 
             List<KeyValuePair<ResourceType, List<int>>> returnList = new List<KeyValuePair<ResourceType, List<int>>>();
 
@@ -107,7 +107,7 @@ namespace Ennui.Script.Official
             { 7,"grandmaster" },
             { 8,"elder" },
         };
-        private static int getToolTier(Api.Direct.IItemStack toolStack)
+        private static int getToolTier(IItemStack toolStack)
         {
             foreach(KeyValuePair<int, string> entry in TOOL_TIER_IDENTIFIERS)
                 if(toolStack.UniqueName.Contains(entry.Value))

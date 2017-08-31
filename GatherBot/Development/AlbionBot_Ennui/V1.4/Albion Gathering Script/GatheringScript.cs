@@ -1,8 +1,6 @@
 ﻿using Ennui.Api;
-using Ennui.Api.Direct.Object;
-using Ennui.Api.Meta;
-using Ennui.Api.Method;
 using Ennui.Api.Script;
+using Ennui.Api.Util;
 using System;
 using System.Collections.Generic;
 
@@ -14,14 +12,19 @@ namespace Ennui.Script.Official
         private Configuration config;
         private Context context;
         private Timer timer;
+        private Api.Object.ILocalPlayerObject localPlayer;
 
         private void LoadConfig()
         {
+            localPlayer = Players.LocalPlayer;
+            var extention = ".json";
+            var title = "Albion_Ennui_gatherer_for_";
+            var file = title + localPlayer.Name + extention;
             try
             {
-                if (Files.Exists("simple-aio-gatherer.json"))
+                if (Files.Exists(file))
                 {
-                    config = Codecs.FromJson<Configuration>(Files.ReadAllText("simple-aio-gatherer.json"));
+                    config = Codecs.FromJson<Configuration>(Files.ReadAllText(file));
                     if (config.TypeSetsToUse == null)
                     {
                         config.TypeSetsToUse = new List<SafeTypeSet>();
@@ -72,21 +75,21 @@ namespace Ennui.Script.Official
         public override void OnPaint(IScriptEngine se, GraphicContext g)
         {
             g.SetColor(new Color(0.3f, 0.3f, 0.3f, 1.0f));
-            g.FillRect(15, 100, 265, 210);
+            g.FillRect(15, 100, 265, 280);
             g.SetColor(new Color(1.0f, 1.0f, 1.0f, 1.0f));
-            g.DrawString("http://ennui.ninja - Simple AIO Gatherer", 20, 100);
+            g.DrawString("Albion Ennui Gatherer", 20, 100);
             g.DrawString(string.Format("Runtime: {0}", Time.FormatElapsed(timer.ElapsedMs)), 20, 115);
             g.DrawString(string.Format("State: {0}", context.State), 20, 130);
-            g.DrawString(string.Format("Max hold weight: {0}", config.MaxHoldWeight), 20, 145);
+            /*g.DrawString(string.Format("Max hold weight: {0}", config.MaxHoldWeight), 20, 145);
             //g.DrawString(string.Format("City cluster: {0}", config.CityClusterName), 20, 160);
             //g.DrawString(string.Format("Resource cluster: {0}", config.ResourceClusterName), 20, 175);
-			g.DrawString(string.Format("Skip Repairing: {0}", config.skipRepairing), 20, 190);
-			g.DrawString(string.Format("Current Weight: {0}", config.currentWeight), 20, 205);
-			g.DrawString(string.Format("Prioritize Roam Point: {0}", config.roamPointFirst), 20, 220);
-			g.DrawString(string.Format("Repair Waypoints Enabled: {0}", config.enableRepairWayPoints), 20, 235);
             g.DrawString(string.Format("Bank cluster: {0}", config.VaultClusterName), 20, 160);
             g.DrawString(string.Format("Repair cluster: {0}", config.RepairClusterName), 20, 175);
             g.DrawString(string.Format("Resource cluster: {0}", config.ResourceClusterName), 20, 190);
+            g.DrawString(string.Format("Skip Repairing: {0}", config.skipRepairing), 20, 205);
+            g.DrawString(string.Format("Current Weight: {0}", config.currentWeight), 20, 220);
+            g.DrawString(string.Format("Prioritize Roam Point: {0}", config.roamPointFirst), 20, 235);
+            g.DrawString(string.Format("Repair Waypoints Enabled: {0}", config.enableRepairWayPoints), 20, 250);*/
 
             if (config.ResourceClusterName == Game.ClusterName)
 			{

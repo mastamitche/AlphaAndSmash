@@ -1,10 +1,6 @@
-﻿using Ennui.Api;
-using Ennui.Api.Direct.Object;
-using Ennui.Api.Meta;
-using Ennui.Api.Method;
+﻿
 using Ennui.Api.Script;
-using System;
-using System.Collections.Generic;
+using Ennui.Api.Util;
 
 namespace Ennui.Script.Official
 {
@@ -21,8 +17,8 @@ namespace Ennui.Script.Official
 
         public override int OnLoop(IScriptEngine se)
         {
-			if (!LoginWindow.IsOpen && !CharacterSelectWindow.IsOpen && !LoginErrorWindow.IsOpen)
-			{
+            if (!LoginWindow.IsOpen && !CharacterSelectWindow.IsOpen && !LoginErrorWindow.IsOpen)
+            {
                 parent.EnterState("gather");
 				return 0;
             }
@@ -37,6 +33,8 @@ namespace Ennui.Script.Official
 			if (LoginWindow.IsOpen)
             {
                 context.State = "Attempting to login";
+                LoginWindow.SetEmail(config.LoginEmail);
+                LoginWindow.SetPassword(config.LoginPassword);
                 LoginWindow.Login();
                 Time.SleepUntil(() => CharacterSelectWindow.IsOpen, 10000);
             }

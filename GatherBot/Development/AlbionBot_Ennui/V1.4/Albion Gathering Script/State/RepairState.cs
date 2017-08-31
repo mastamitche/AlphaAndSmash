@@ -1,6 +1,7 @@
-﻿using Ennui.Api;
+﻿
 using Ennui.Api.Method;
 using Ennui.Api.Script;
+using Ennui.Api.Util;
 
 namespace Ennui.Script.Official
 {
@@ -26,7 +27,7 @@ namespace Ennui.Script.Official
 
 			if (config.enableRepairWayPoints)
 			{
-				if (!config.RepairArea.RealArea(Api).Contains(localPlayer.ThreadSafeLocation))
+				if (!config.RepairArea.RealArea(Api).Contains(localPlayer.Location))
 				{
 					context.State = "Walking to repair area...";
 					bool reachedWP1 = false;
@@ -85,7 +86,7 @@ namespace Ennui.Script.Official
 			}
 			else
 			{
-				if (!config.RepairArea.RealArea(Api).Contains(localPlayer.ThreadSafeLocation))
+				if (!config.RepairArea.RealArea(Api).Contains(localPlayer.Location))
 				{
 					context.State = "Walking to repair area...";
 
@@ -169,7 +170,7 @@ namespace Ennui.Script.Official
             {
                 context.State = "Opening repair building...";
 
-                var building = Objects.RepairChain.Closest(localPlayer.ThreadSafeLocation);
+                var building = Objects.RepairChain.Closest(localPlayer.Location);
                 if (building == null)
                 {
                     context.State = "Failed to find repair building!";
